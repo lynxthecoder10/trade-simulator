@@ -55,7 +55,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="hidden sm:flex items-center gap-4">
         {/* Trading Terms Glossary quick-help */}
         <div className="flex items-center gap-1">
           <span>Trading Terms</span>

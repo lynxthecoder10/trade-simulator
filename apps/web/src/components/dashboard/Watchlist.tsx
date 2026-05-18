@@ -242,7 +242,7 @@ export function Watchlist() {
       </div>
 
       {/* Right Column: TradingView Sleek Option Toolbar Strip */}
-      <div className="w-[38px] h-full bg-[#090d16] border-l border-border/80 flex flex-col items-center py-2 shrink-0 gap-2 select-none z-10">
+      <div className="hidden md:flex w-[38px] h-full bg-[#090d16] border-l border-border/80 flex-col items-center py-2 shrink-0 gap-2 select-none z-10">
         {rightTabs.map((tab) => {
           const TabIcon = tab.icon;
           const isActive = activeRightTab === tab.id;
