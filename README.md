@@ -44,17 +44,29 @@ The app will be available on `http://localhost:3000`.
 
 ---
 
-## 🚀 Deployment
+## 🚀 Deployment & Live Sites
 
-Because the application uses a decoupled client-side design, you can deploy it as a fully static or serverless site on hosting platforms like **Vercel**, **Netlify**, or **GitHub Pages**.
+The application is fully optimized for cloud container platforms like **Railway** and serverless environments like **Vercel** with complete monorepo mapping out-of-the-box.
 
-### Build for Production
-To bundle the optimized Next.js app:
-```bash
-pnpm --filter web build
-```
+### 🌐 Live Production URL
+* **Railway Deployment:** [tradesimulator.up.railway.app](https://tradesimulator.up.railway.app)
+* **Port Bindings:** Dynamically listens on container port `8080` internally and serves standard HTTP/HTTPS.
+
+### ⚙️ Monorepo Cloud Engine Settings
+To ensure seamless deployment in CI/CD cloud environments, configure the following setting in your deployment panel:
+* **Environment Variable:** `ENABLE_EXPERIMENTAL_COREPACK = 1`
+* This automatically enables Node's Corepack and fetches the pinned, stable `pnpm@9.15.2` package manager directly from the registry during builds.
+
+---
+
+## 🔑 Platform & Agent Credentials
+For quick reference during integration and developer setup:
+* **21st.dev Invite Code:** `myf9rbg2Tc`
+* **21st.dev Invite Link:** [Join Platform](https://21st.dev/invite?code=myf9rbg2Tc&source=agents)
+* **Platform Auth Token:** `193daa7c8cc2d54030062a2d22ec5b3cfcc33110c38c358d03fc36558fbf0739`
 
 ---
 
 ## 📜 License
 MIT License. Created by LynxTheCoder.
+
