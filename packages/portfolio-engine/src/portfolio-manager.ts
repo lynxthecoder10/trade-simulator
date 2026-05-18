@@ -58,6 +58,22 @@ export class PortfolioManager {
   public getBalance(): number {
     return this.balanceEngine.getBalance();
   }
+
+  public reset(startingBalance: number = 100000) {
+    this.positionEngine.reset();
+    
+    // Debit everything to reach 0 first, then credit starting balance
+    this.balanceEngine.debit(this.balanceEngine.getBalance());
+    this.balanceEngine.credit(startingBalance);
+
+    // Publish balance update event so downstream clients sync balance
+    globalEventBus.publish(EventType.BALANCE_UPDATED, {
+      newBalance: startingBalance,
+      delta: 0,
+      reason: 'RESET',
+      timestamp: globalClock.getCurrentTime()
+    });
+  }
 }
 
 export const globalPortfolioManager = new PortfolioManager();

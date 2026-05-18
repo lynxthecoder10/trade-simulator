@@ -16,13 +16,22 @@ interface PortfolioState {
   positions: Position[];
   initialize: () => void;
   sendOrder: (symbol: string, quantity: number, price: number, isBuy: boolean, isIntraday?: boolean) => { success: boolean, reason?: string };
+  reset: () => void;
 }
 
 export const usePortfolioStore = create<PortfolioState>((set, get) => ({
   balance: 100000,
   positions: [],
   initialize: () => {
-    // Sync initial state
+    // Sync initial state and look up persisted starting balance
+    let savedBalance = 100000;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('trade_starting_balance');
+      if (stored) {
+        savedBalance = Number(stored);
+        globalPortfolioManager.reset(savedBalance);
+      }
+    }
     set({ balance: globalPortfolioManager.getBalance() });
 
     // Subscribe to balance changes
@@ -90,5 +99,19 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
     });
 
     return { success: true };
+  },
+  reset: () => {
+    let savedBalance = 100000;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('trade_starting_balance');
+      if (stored) {
+        savedBalance = Number(stored);
+      }
+    }
+    globalPortfolioManager.reset(savedBalance);
+    set({
+      balance: savedBalance,
+      positions: []
+    });
   }
 }));

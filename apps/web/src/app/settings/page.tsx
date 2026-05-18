@@ -1,8 +1,10 @@
 'use client';
 
 import { Settings, RefreshCw, ShieldAlert, Sparkles, Sliders } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
+import { useMarketStore } from '@/stores/market-store';
+import { usePortfolioStore } from '@/stores/portfolio-store';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
 
@@ -12,13 +14,54 @@ export default function SettingsPage() {
   const [tickSpeed, setTickSpeed] = useState<number>(3); // 3 second ticks
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const { user } = useAuthStore();
+  const resetPortfolio = usePortfolioStore((state) => state.reset);
+  const marketEngine = useMarketStore((state) => state.engine);
 
   const displayCurrency = user?.displayCurrency || 'INR';
   const currencySymbol = displayCurrency === 'INR' ? '₹' : displayCurrency === 'USD' ? '$' : '€';
 
+  // Load configured engine settings from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedBalance = localStorage.getItem('trade_starting_balance');
+      const storedSlippage = localStorage.getItem('trade_slippage');
+      const storedSpeed = localStorage.getItem('trade_tick_speed');
+
+      if (storedBalance) setStartingBalance(Number(storedBalance));
+      if (storedSlippage) setSlippage(Number(storedSlippage));
+      if (storedSpeed) setTickSpeed(Number(storedSpeed));
+    }
+  }, []);
+
+  const handleStartingBalanceChange = (val: number) => {
+    setStartingBalance(val);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('trade_starting_balance', val.toString());
+    }
+  };
+
+  const handleSlippageChange = (val: number) => {
+    setSlippage(val);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('trade_slippage', val.toString());
+    }
+  };
+
+  const handleTickSpeedChange = (val: number) => {
+    setTickSpeed(val);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('trade_tick_speed', val.toString());
+    }
+    // Update live engine tick rate dynamically on the fly!
+    if (marketEngine) {
+      marketEngine.updateTickRate(val * 1000);
+    }
+  };
+
   const handleReset = () => {
     setIsResetting(true);
     setTimeout(() => {
+      resetPortfolio();
       setIsResetting(false);
       alert("Simulation ledger, positions, and history have been completely reset to factory defaults! 🚀");
     }, 1200);
@@ -57,7 +100,7 @@ export default function SettingsPage() {
               max={1000000} 
               step={10000}
               value={startingBalance} 
-              onChange={(e) => setStartingBalance(Number(e.target.value))}
+              onChange={(e) => handleStartingBalanceChange(Number(e.target.value))}
               className="w-full h-1.5 bg-background rounded-lg appearance-none cursor-pointer accent-primary border border-border/60" 
             />
           </div>
@@ -77,7 +120,7 @@ export default function SettingsPage() {
               max={1.5} 
               step={0.05}
               value={slippage} 
-              onChange={(e) => setSlippage(Number(e.target.value))}
+              onChange={(e) => handleSlippageChange(Number(e.target.value))}
               className="w-full h-1.5 bg-background rounded-lg appearance-none cursor-pointer accent-primary border border-border/60" 
             />
           </div>
@@ -97,7 +140,7 @@ export default function SettingsPage() {
               max={10} 
               step={1}
               value={tickSpeed} 
-              onChange={(e) => setTickSpeed(Number(e.target.value))}
+              onChange={(e) => handleTickSpeedChange(Number(e.target.value))}
               className="w-full h-1.5 bg-background rounded-lg appearance-none cursor-pointer accent-primary border border-border/60" 
             />
           </div>

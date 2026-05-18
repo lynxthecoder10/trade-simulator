@@ -75,6 +75,11 @@ export class MarketEngine {
     }, tickRateMs);
   }
 
+  public updateTickRate(tickRateMs: number) {
+    this.stop();
+    this.start(tickRateMs);
+  }
+
   public stop() {
     if (this.intervalId) clearInterval(this.intervalId);
     this.intervalId = null;

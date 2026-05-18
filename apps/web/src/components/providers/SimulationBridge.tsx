@@ -37,8 +37,15 @@ export function SimulationBridge({ children }: { children: React.ReactNode }) {
     // Initialize Market Engine with Real-World Yahoo Finance symbols
     const marketEngine = new MarketEngine(defaultSymbols);
     
-    // Start polling loop (every 3 seconds for extremely fast live updates)
-    marketEngine.start(3000);
+    // Start polling loop using user-configured tick speed from settings if present
+    let initialTickSpeed = 3;
+    if (typeof window !== 'undefined') {
+      const savedSpeed = localStorage.getItem('trade_tick_speed');
+      if (savedSpeed) {
+        initialTickSpeed = Number(savedSpeed);
+      }
+    }
+    marketEngine.start(initialTickSpeed * 1000);
     engineRef.current = marketEngine;
     
     // Pass the engine reference to our global store

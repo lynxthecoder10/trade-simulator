@@ -55,4 +55,8 @@ export class PositionEngine {
 
     return { position: pos, realizedPnl, closedQuantity };
   }
+
+  reset() {
+    this.positions.clear();
+  }
 }

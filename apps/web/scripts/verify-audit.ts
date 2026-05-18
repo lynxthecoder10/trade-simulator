@@ -8,8 +8,11 @@ import { globalRiskEngine } from '@trade/risk-engine';
 if (typeof crypto === 'undefined' || !crypto.randomUUID) {
   // @ts-ignore
   global.crypto = {
-    randomUUID: () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-  } as unknown as Crypto;
+    randomUUID: (() => {
+      const p = () => Math.random().toString(16).substring(2, 6);
+      return `${p()}${p()}-${p()}-${p()}-${p()}-${p()}${p()}${p()}` as `${string}-${string}-${string}-${string}-${string}`;
+    })
+  };
 }
 
 console.log("\n=======================================================");
@@ -52,6 +55,7 @@ try {
   globalEventBus.publish(EventType.MARKET_TICK, {
     symbol: 'RELIANCE',
     price: 2410,
+    volume: 100,
     timestamp: Date.now()
   });
 
@@ -70,6 +74,7 @@ try {
   globalEventBus.publish(EventType.MARKET_TICK, {
     symbol: 'RELIANCE',
     price: 2405,
+    volume: 100,
     timestamp: Date.now()
   });
 
@@ -79,6 +84,7 @@ try {
   globalEventBus.publish(EventType.MARKET_TICK, {
     symbol: 'RELIANCE',
     price: 2398,
+    volume: 100,
     timestamp: Date.now()
   });
 
@@ -114,7 +120,7 @@ try {
   const engine = new ExecutionEngine();
 
   // Tick price to feed market price to execution engine
-  globalEventBus.publish(EventType.MARKET_TICK, { symbol: 'TCS', price: 3500, timestamp: Date.now() });
+  globalEventBus.publish(EventType.MARKET_TICK, { symbol: 'TCS', price: 3500, volume: 100, timestamp: Date.now() });
 
   // Placed Order
   globalEventBus.publish(EventType.ORDER_PLACED, {
@@ -229,6 +235,7 @@ try {
     globalEventBus.publish(EventType.MARKET_TICK, {
       symbol: 'INFY',
       price: 1400 + (i % 20),
+      volume: 100,
       timestamp: Date.now()
     });
   }
@@ -265,7 +272,7 @@ try {
     fired = true;
   });
   
-  globalEventBus.publish(EventType.MARKET_TICK, { symbol: 'TCS', price: 3500, timestamp: Date.now() });
+  globalEventBus.publish(EventType.MARKET_TICK, { symbol: 'TCS', price: 3500, volume: 100, timestamp: Date.now() });
 
   if (fired) {
     registerTest("Memory Leak Subscriptions", "PASSED", "Cleaned up 10,000 listeners successfully without retaining callbacks.");
