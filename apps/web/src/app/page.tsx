@@ -18,7 +18,6 @@ function generateInitialCandles(basePrice: number): CandlestickData[] {
   let currentPrice = basePrice;
   const now = Math.floor(Date.now() / 1000);
   
-  // Generate 50 historical candles (1 minute each)
   for (let i = 50; i >= 0; i--) {
     const time = (now - i * 60) as Time;
     const volatility = 2.5;
@@ -52,18 +51,15 @@ export default function DashboardPage() {
   } = useUiStore();
   const { watchlist } = useMarketStore();
   
-  // Store chart data per symbol
   const [chartDataMap, setChartDataMap] = useState<Record<string, CandlestickData[]>>({});
 
   useEffect(() => {
-    // Initial data generation
     const initialData: Record<string, CandlestickData[]> = {};
     SYMBOLS.forEach(symbol => {
       initialData[symbol] = generateInitialCandles(BASE_PRICES[symbol]);
     });
     setChartDataMap(initialData);
 
-    // Subscribe to Event Bus for real-time chart updates
     const unsubscribe = globalEventBus.subscribe(EventType.MARKET_TICK, (tick: any) => {
       setChartDataMap(prev => {
         const symbolData = [...(prev[tick.symbol] || [])];
@@ -102,30 +98,44 @@ export default function DashboardPage() {
   const currencySymbol = isIndianStock ? '₹' : '$';
 
   return (
-    <div className="flex h-[calc(100vh-2rem-64px)] gap-4 flex-col lg:flex-row relative">
+    <div 
+      className={cn(
+        "flex h-[calc(100vh-64px)] w-full overflow-hidden bg-[#020617] transition-all duration-300",
+        isTerminalMode ? "p-0 gap-0" : "p-3 gap-3 flex-col lg:flex-row"
+      )}
+    >
       {/* Left Sidebar - Watchlist (Hidden in Terminal Mode) */}
       {!isTerminalMode && (
-        <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 h-[300px] lg:h-full transition-all duration-300">
+        <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 h-[300px] lg:h-full flex flex-col overflow-hidden transition-all duration-300">
           <Watchlist />
         </div>
       )}
 
       {/* Main Content - Chart */}
-      <div className="flex flex-1 flex-col gap-4 min-h-[400px]">
+      <div className="flex flex-1 flex-col gap-3 min-w-0 h-full overflow-hidden">
         {/* Glassmorphic Live Header */}
-        <div className="flex items-center justify-between bg-card/65 backdrop-blur-md rounded-lg border border-border/80 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all">
+        <div 
+          className={cn(
+            "flex items-center justify-between border backdrop-blur-md transition-all shadow-[0_4px_20px_rgba(0,0,0,0.4)]",
+            isTerminalMode 
+              ? "bg-[#090d16]/90 border-b border-border/80 border-t-0 border-l-0 border-r-0 rounded-none p-4" 
+              : "bg-card/65 border-border/80 rounded-lg p-4"
+          )}
+        >
           <div className="flex items-center gap-6">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">{selectedSymbol || 'Select Symbol'}</h1>
-              <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Equity</span>
+              <h1 className="text-xl lg:text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                {selectedSymbol || 'Select Symbol'}
+              </h1>
+              <span className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider block mt-0.5">Equity</span>
             </div>
             
             {selectedSymbol && (
               <div className="flex flex-col">
-                <span className="text-2xl font-bold tabular-nums text-white">
+                <span className="text-xl lg:text-2xl font-black tabular-nums text-white">
                   {currencySymbol}{currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
-                <span className={cn("text-sm font-medium flex items-center tabular-nums", isPositive ? "text-emerald-500" : "text-rose-500")}>
+                <span className={cn("text-xs font-semibold flex items-center tabular-nums mt-0.5", isPositive ? "text-emerald-500" : "text-rose-500")}>
                   {isPositive ? '+' : ''}{currentChange.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({isPositive ? '+' : ''}{currentChangePercent.toFixed(2)}%)
                 </span>
               </div>
@@ -147,7 +157,7 @@ export default function DashboardPage() {
                   )}
                   title="Single Chart"
                 >
-                  <Square className="w-4 h-4" />
+                  <Square className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setChartGrid(2)}
@@ -159,7 +169,7 @@ export default function DashboardPage() {
                   )}
                   title="Split Charts (2)"
                 >
-                  <Columns className="w-4 h-4" />
+                  <Columns className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setChartGrid(4)}
@@ -171,7 +181,7 @@ export default function DashboardPage() {
                   )}
                   title="Quad Charts (4)"
                 >
-                  <Grid className="w-4 h-4" />
+                  <Grid className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
@@ -180,7 +190,7 @@ export default function DashboardPage() {
             <button
               onClick={() => setTerminalMode(!isTerminalMode)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold tracking-wide transition-all shadow-md active:scale-95",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] lg:text-xs font-semibold tracking-wide transition-all shadow-md active:scale-95",
                 isTerminalMode 
                   ? "bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20" 
                   : "bg-primary/10 border-primary/30 text-primary-foreground hover:bg-primary/20"
@@ -189,12 +199,12 @@ export default function DashboardPage() {
               {isTerminalMode ? (
                 <>
                   <Minimize2 className="w-3.5 h-3.5" />
-                  <span>EXIT FULLSCREEN</span>
+                  <span className="hidden sm:inline">EXIT FULLSCREEN</span>
                 </>
               ) : (
                 <>
                   <Maximize2 className="w-3.5 h-3.5" />
-                  <span>PRO TERMINAL</span>
+                  <span className="hidden sm:inline">PRO TERMINAL</span>
                 </>
               )}
             </button>
@@ -202,13 +212,13 @@ export default function DashboardPage() {
             {/* Live Indicator */}
             <div className="hidden sm:flex items-center px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-               <span className="text-xs font-semibold tracking-wide text-emerald-400">LIVE FEED</span>
+               <span className="text-[10px] font-bold tracking-wide text-emerald-400">LIVE FEED</span>
             </div>
           </div>
         </div>
         
         {/* Expanded Chart Grid Container */}
-        <div className="flex-1 min-h-[450px]">
+        <div className="flex-1 min-h-0 overflow-hidden">
           {selectedSymbol ? (
             <TradingChart 
               symbol={selectedSymbol} 
@@ -216,8 +226,8 @@ export default function DashboardPage() {
               grid={chartGrid} 
             />
           ) : (
-            <div className="w-full h-full min-h-[400px] bg-card rounded-lg border border-border flex items-center justify-center">
-              <p className="text-muted-foreground">Select a symbol from the watchlist to view chart</p>
+            <div className="w-full h-full bg-[#090d16] rounded-lg border border-border/80 flex items-center justify-center">
+              <p className="text-muted-foreground text-sm font-semibold">Select a symbol from the watchlist to view chart</p>
             </div>
           )}
         </div>
@@ -225,9 +235,15 @@ export default function DashboardPage() {
 
       {/* Right Sidebar - Order Panel & Analyst (Hidden in Terminal Mode) */}
       {!isTerminalMode && (
-        <div className="w-full lg:w-[320px] xl:w-[340px] shrink-0 flex flex-col gap-4 overflow-y-auto transition-all duration-300">
-          <OrderPanel />
-          {selectedSymbol && <AnalystFeedback symbol={selectedSymbol} />}
+        <div className="w-full lg:w-[320px] xl:w-[340px] shrink-0 h-full flex flex-col gap-3 overflow-y-auto transition-all duration-300">
+          <div className="flex-1 min-h-[300px]">
+            <OrderPanel />
+          </div>
+          {selectedSymbol && (
+            <div className="shrink-0">
+              <AnalystFeedback symbol={selectedSymbol} />
+            </div>
+          )}
         </div>
       )}
     </div>
