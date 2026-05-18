@@ -18,6 +18,24 @@ export class RiskEngine {
     isIntraday: boolean, 
     currentBalance: number
   ): { isValid: boolean; reason?: string } {
+    // Strict input bounds, types, NaN, and negative parameters validation
+    if (typeof quantity !== 'number' || isNaN(quantity) || !isFinite(quantity) || quantity <= 0) {
+      return { isValid: false, reason: 'Invalid quantity: Must be a positive non-zero number' };
+    }
+    if (!Number.isInteger(quantity)) {
+      return { isValid: false, reason: 'Invalid quantity: Fractional shares not supported in simulation' };
+    }
+    if (quantity > 10000000) {
+      return { isValid: false, reason: 'Invalid quantity: Quantity exceeds maximum safety threshold' };
+    }
+
+    if (typeof price !== 'number' || isNaN(price) || !isFinite(price) || price <= 0) {
+      return { isValid: false, reason: 'Invalid price: Must be a positive non-zero number' };
+    }
+    if (price > 100000000) {
+      return { isValid: false, reason: 'Invalid price: Price exceeds maximum simulation limit' };
+    }
+
     const leverage = isIntraday ? this.config.maxLeverage : 1;
     
     const marginCheck = this.marginValidator.validateMargin(currentBalance, quantity, price, leverage);

@@ -31,11 +31,27 @@ export const useAuthStore = create<AuthState>((set) => {
     try {
       const uStr = localStorage.getItem('tradesim_user');
       if (uStr) {
-        persistedUser = JSON.parse(uStr);
-        persistedAuth = true;
+        const parsed = JSON.parse(uStr);
+        // Robust schema check to prevent data corruption crashes
+        if (
+          parsed && 
+          typeof parsed === 'object' && 
+          typeof parsed.username === 'string' &&
+          ['INR', 'USD', 'EUR'].includes(parsed.displayCurrency)
+        ) {
+          persistedUser = parsed;
+          persistedAuth = true;
+        } else {
+          // Heal corrupted schema automatically
+          console.warn("Detected corrupted TradeSim session schema. Auto-healing to default state.");
+          localStorage.removeItem('tradesim_user');
+        }
       }
     } catch (e) {
-      console.error("Failed to parse persistent user", e);
+      console.error("Failed to parse persistent user, auto-healing corrupted storage.", e);
+      try {
+        localStorage.removeItem('tradesim_user');
+      } catch (_) {}
     }
   }
 
