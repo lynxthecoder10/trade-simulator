@@ -10,6 +10,7 @@ import { CandlestickData, Time } from 'lightweight-charts';
 import { useMarketStore } from '@/stores/market-store';
 import { globalEventBus, EventType } from '@trade/event-bus';
 import { cn } from '@/lib/utils';
+import { Maximize2, Minimize2, Grid, Columns, Square } from 'lucide-react';
 
 // Generator to create realistic initial candles
 function generateInitialCandles(basePrice: number): CandlestickData[] {
@@ -42,7 +43,13 @@ const BASE_PRICES: Record<string, number> = {
 };
 
 export default function DashboardPage() {
-  const { selectedSymbol } = useUiStore();
+  const { 
+    selectedSymbol, 
+    isTerminalMode, 
+    setTerminalMode, 
+    chartGrid, 
+    setChartGrid 
+  } = useUiStore();
   const { watchlist } = useMarketStore();
   
   // Store chart data per symbol
@@ -95,44 +102,119 @@ export default function DashboardPage() {
   const currencySymbol = isIndianStock ? '₹' : '$';
 
   return (
-    <div className="flex h-[calc(100vh-2rem-64px)] gap-4 flex-col lg:flex-row">
-      {/* Left Sidebar - Watchlist */}
-      <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 h-[300px] lg:h-full">
-        <Watchlist />
-      </div>
+    <div className="flex h-[calc(100vh-2rem-64px)] gap-4 flex-col lg:flex-row relative">
+      {/* Left Sidebar - Watchlist (Hidden in Terminal Mode) */}
+      {!isTerminalMode && (
+        <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 h-[300px] lg:h-full transition-all duration-300">
+          <Watchlist />
+        </div>
+      )}
 
       {/* Main Content - Chart */}
       <div className="flex flex-1 flex-col gap-4 min-h-[400px]">
-        <div className="flex items-center justify-between bg-card rounded-lg border border-border p-4 shadow-sm">
+        {/* Glassmorphic Live Header */}
+        <div className="flex items-center justify-between bg-card/65 backdrop-blur-md rounded-lg border border-border/80 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all">
           <div className="flex items-center gap-6">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">{selectedSymbol || 'Select Symbol'}</h1>
+              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">{selectedSymbol || 'Select Symbol'}</h1>
               <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Equity</span>
             </div>
             
             {selectedSymbol && (
               <div className="flex flex-col">
-                <span className="text-2xl font-bold tabular-nums">
+                <span className="text-2xl font-bold tabular-nums text-white">
                   {currencySymbol}{currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
-                <span className={cn("text-sm font-medium flex items-center tabular-nums", isPositive ? "text-profit" : "text-loss")}>
+                <span className={cn("text-sm font-medium flex items-center tabular-nums", isPositive ? "text-emerald-500" : "text-rose-500")}>
                   {isPositive ? '+' : ''}{currentChange.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({isPositive ? '+' : ''}{currentChangePercent.toFixed(2)}%)
                 </span>
               </div>
             )}
           </div>
 
-          <div className="flex items-center">
-            <div className="flex items-center px-3 py-1 rounded-full bg-accent/50 border border-border">
-               <span className="w-2 h-2 rounded-full bg-profit mr-2 animate-pulse shadow-[0_0_8px_rgba(22,163,74,0.8)]"></span>
-               <span className="text-xs font-semibold tracking-wide">MARKET OPEN</span>
+          {/* Interactive Layout Controls (Inspired by 21st.dev Premium Terminals) */}
+          <div className="flex items-center gap-3">
+            {/* Grid Switchers (Only show when selectedSymbol is active) */}
+            {selectedSymbol && (
+              <div className="flex items-center bg-background/80 border border-border/60 rounded-lg p-0.5 shadow-inner">
+                <button
+                  onClick={() => setChartGrid(1)}
+                  className={cn(
+                    "p-1.5 rounded transition-all",
+                    chartGrid === 1 
+                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-white"
+                  )}
+                  title="Single Chart"
+                >
+                  <Square className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setChartGrid(2)}
+                  className={cn(
+                    "p-1.5 rounded transition-all",
+                    chartGrid === 2 
+                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-white"
+                  )}
+                  title="Split Charts (2)"
+                >
+                  <Columns className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setChartGrid(4)}
+                  className={cn(
+                    "p-1.5 rounded transition-all",
+                    chartGrid === 4 
+                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      : "text-muted-foreground hover:text-white"
+                  )}
+                  title="Quad Charts (4)"
+                >
+                  <Grid className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Terminal / Full Screen Toggle */}
+            <button
+              onClick={() => setTerminalMode(!isTerminalMode)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold tracking-wide transition-all shadow-md active:scale-95",
+                isTerminalMode 
+                  ? "bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20" 
+                  : "bg-primary/10 border-primary/30 text-primary-foreground hover:bg-primary/20"
+              )}
+            >
+              {isTerminalMode ? (
+                <>
+                  <Minimize2 className="w-3.5 h-3.5" />
+                  <span>EXIT FULLSCREEN</span>
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span>PRO TERMINAL</span>
+                </>
+              )}
+            </button>
+
+            {/* Live Indicator */}
+            <div className="hidden sm:flex items-center px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+               <span className="text-xs font-semibold tracking-wide text-emerald-400">LIVE FEED</span>
             </div>
           </div>
         </div>
         
-        <div className="flex-1">
+        {/* Expanded Chart Grid Container */}
+        <div className="flex-1 min-h-[450px]">
           {selectedSymbol ? (
-            <TradingChart data={currentChartData} />
+            <TradingChart 
+              symbol={selectedSymbol} 
+              heightClass="h-full" 
+              grid={chartGrid} 
+            />
           ) : (
             <div className="w-full h-full min-h-[400px] bg-card rounded-lg border border-border flex items-center justify-center">
               <p className="text-muted-foreground">Select a symbol from the watchlist to view chart</p>
@@ -141,11 +223,13 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Right Sidebar - Order Panel & Analyst */}
-      <div className="w-full lg:w-[320px] xl:w-[340px] shrink-0 flex flex-col gap-4 overflow-y-auto">
-        <OrderPanel />
-        {selectedSymbol && <AnalystFeedback symbol={selectedSymbol} />}
-      </div>
+      {/* Right Sidebar - Order Panel & Analyst (Hidden in Terminal Mode) */}
+      {!isTerminalMode && (
+        <div className="w-full lg:w-[320px] xl:w-[340px] shrink-0 flex flex-col gap-4 overflow-y-auto transition-all duration-300">
+          <OrderPanel />
+          {selectedSymbol && <AnalystFeedback symbol={selectedSymbol} />}
+        </div>
+      )}
     </div>
   );
 }
