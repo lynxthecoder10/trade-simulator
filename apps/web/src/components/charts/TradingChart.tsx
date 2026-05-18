@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useUiStore } from '@/stores/ui-store';
+import { DrawingToolbar } from '@/components/dashboard/DrawingToolbar';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface TradingChartProps {
   data?: any[];
@@ -66,9 +68,14 @@ function SingleChartWidget({ symbol, index }: SingleChartWidgetProps) {
 
   return (
     <div className="w-full h-full min-h-[250px] bg-[#090d16] border border-border/80 rounded-md overflow-hidden relative shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
-      <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-border/40 text-xs font-bold text-primary flex items-center gap-1.5 pointer-events-none">
+      <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-border/40 text-[10px] font-bold text-primary flex items-center gap-1.5 pointer-events-none">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
         {symbol} (5M)
+        <Tooltip 
+          title="Interactive Candlesticks" 
+          content="Green candlesticks mean closing price exceeded open. Red means sellers drove prices down. Trace hover triggers for price updates." 
+          className="ml-1 pointer-events-auto"
+        />
       </div>
       <div ref={containerRef} className="w-full h-full" />
     </div>
@@ -89,29 +96,43 @@ export function TradingChart({ symbol: propSymbol, heightClass = 'h-[500px]', gr
     'HDFCBANK'
   ];
 
-  if (activeGrid === 2) {
-    return (
-      <div className={`w-full ${heightClass} grid grid-cols-1 md:grid-cols-2 gap-2 bg-[#020617] rounded-lg border border-border p-1.5 shadow-xl`}>
-        <SingleChartWidget symbol={gridSymbols[0]} index={0} />
-        <SingleChartWidget symbol={gridSymbols[1]} index={1} />
-      </div>
-    );
-  }
+  const renderGridContent = () => {
+    if (activeGrid === 2) {
+      return (
+        <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-2 bg-[#020617]">
+          <SingleChartWidget symbol={gridSymbols[0]} index={0} />
+          <SingleChartWidget symbol={gridSymbols[1]} index={1} />
+        </div>
+      );
+    }
 
-  if (activeGrid === 4) {
+    if (activeGrid === 4) {
+      return (
+        <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 grid-rows-2 gap-2 bg-[#020617]">
+          <SingleChartWidget symbol={gridSymbols[0]} index={0} />
+          <SingleChartWidget symbol={gridSymbols[1]} index={1} />
+          <SingleChartWidget symbol={gridSymbols[2]} index={2} />
+          <SingleChartWidget symbol={gridSymbols[3]} index={3} />
+        </div>
+      );
+    }
+
     return (
-      <div className={`w-full ${heightClass} grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 grid-rows-2 gap-2 bg-[#020617] rounded-lg border border-border p-1.5 shadow-xl`}>
-        <SingleChartWidget symbol={gridSymbols[0]} index={0} />
-        <SingleChartWidget symbol={gridSymbols[1]} index={1} />
-        <SingleChartWidget symbol={gridSymbols[2]} index={2} />
-        <SingleChartWidget symbol={gridSymbols[3]} index={3} />
+      <div className="w-full h-full">
+        <SingleChartWidget symbol={activeSymbol} index={0} />
       </div>
     );
-  }
+  };
 
   return (
-    <div className={`w-full ${heightClass} bg-[#020617] rounded-lg border border-border overflow-hidden p-1.5 shadow-xl flex flex-col relative`}>
-      <SingleChartWidget symbol={activeSymbol} index={0} />
+    <div className={`w-full ${heightClass} bg-[#020617] rounded-lg border border-border overflow-hidden p-1.5 shadow-xl flex flex-row relative`}>
+      {/* TradingView drawing tools sidebar */}
+      <DrawingToolbar />
+      
+      {/* Active Chart Viewport */}
+      <div className="flex-1 h-full min-w-0 pl-1.5">
+        {renderGridContent()}
+      </div>
     </div>
   );
 }

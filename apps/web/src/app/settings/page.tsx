@@ -1,7 +1,9 @@
 'use client';
 
-import { Settings, RefreshCw, HelpCircle, ShieldAlert, Sparkles, Sliders } from 'lucide-react';
+import { Settings, RefreshCw, ShieldAlert, Sparkles, Sliders } from 'lucide-react';
 import { useState } from 'react';
+import { useAuthStore } from '@/stores/auth-store';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
 
 export default function SettingsPage() {
@@ -9,6 +11,10 @@ export default function SettingsPage() {
   const [slippage, setSlippage] = useState<number>(0.2); // 0.2% slippage standard
   const [tickSpeed, setTickSpeed] = useState<number>(3); // 3 second ticks
   const [isResetting, setIsResetting] = useState<boolean>(false);
+  const { user } = useAuthStore();
+
+  const displayCurrency = user?.displayCurrency || 'INR';
+  const currencySymbol = displayCurrency === 'INR' ? '₹' : displayCurrency === 'USD' ? '$' : '€';
 
   const handleReset = () => {
     setIsResetting(true);
@@ -19,10 +25,10 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-4 lg:p-8 space-y-8">
+    <div className="max-w-3xl mx-auto p-4 lg:p-8 space-y-8 h-full overflow-y-auto pb-16">
       {/* Page Header */}
       <div className="border-b border-border/60 pb-6">
-        <h1 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Simulator Settings</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Simulator Settings</h1>
         <p className="text-muted-foreground text-sm">
           Customize matching engine parameters, tick frequencies, account multipliers, and audit defaults.
         </p>
@@ -41,11 +47,9 @@ export default function SettingsPage() {
             <div className="flex justify-between items-center text-sm font-semibold">
               <label className="text-muted-foreground flex items-center gap-1.5">
                 Starting Mock Balance
-                <span title="Configures default account balance on simulation resetting.">
-                  <HelpCircle className="w-3.5 h-3.5 text-muted-foreground/60 cursor-help" />
-                </span>
+                <Tooltip title="Starting Mock Balance" content="Configures the default liquid cash allocation you receive upon creating a new account or resetting the simulation clock." />
               </label>
-              <span className="text-white font-bold">₹{startingBalance.toLocaleString()}</span>
+              <span className="text-white font-bold">{currencySymbol}{startingBalance.toLocaleString()}</span>
             </div>
             <input 
               type="range" 
@@ -63,9 +67,7 @@ export default function SettingsPage() {
             <div className="flex justify-between items-center text-sm font-semibold">
               <label className="text-muted-foreground flex items-center gap-1.5">
                 Slippage Factor (Volatility Multiplier)
-                <span title="Modulates the matching slippage incurred under heavy volatility spikes.">
-                  <HelpCircle className="w-3.5 h-3.5 text-muted-foreground/60 cursor-help" />
-                </span>
+                <Tooltip title="Slippage Factor" content="The difference between the expected price of a trade and the actual price at which the trade is executed. Higher volatility triggers more slippage." />
               </label>
               <span className="text-white font-bold">{slippage.toFixed(2)}%</span>
             </div>
@@ -85,9 +87,7 @@ export default function SettingsPage() {
             <div className="flex justify-between items-center text-sm font-semibold">
               <label className="text-muted-foreground flex items-center gap-1.5">
                 Clock Tick Frequency
-                <span title="Specifies the duration between incoming live data tick refreshes.">
-                  <HelpCircle className="w-3.5 h-3.5 text-muted-foreground/60 cursor-help" />
-                </span>
+                <Tooltip title="Clock Tick Frequency" content="Determines how fast new simulated price quotes are pushed to the charts and portfolio calculation engines." />
               </label>
               <span className="text-white font-bold">{tickSpeed}s</span>
             </div>
@@ -114,7 +114,7 @@ export default function SettingsPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-sm font-bold text-white">Reset Trading History</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs text-muted-foreground leading-relaxed font-semibold">
               Resets all active portfolio valuations, ledger logs, and matching history back to initial values. This action is irreversible.
             </p>
           </div>

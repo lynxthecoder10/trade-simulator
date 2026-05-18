@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, Briefcase, LayoutDashboard, Settings, BookOpen } from 'lucide-react';
+import { Activity, Briefcase, LayoutDashboard, Settings, BookOpen, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -10,6 +10,7 @@ const navigation = [
   { name: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { name: 'Analytics', href: '/analytics', icon: Activity },
   { name: 'Learn', href: '/learn', icon: BookOpen },
+  { name: 'Profile', href: '/profile', icon: User },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
