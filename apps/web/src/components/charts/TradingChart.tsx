@@ -91,9 +91,9 @@ export function TradingChart({ symbol: propSymbol, heightClass = 'h-[500px]', gr
   // Symbols to display in grid modes
   const gridSymbols = [
     activeSymbol,
-    'TCS',
-    'INFY',
-    'HDFCBANK'
+    'TCS.NS',
+    'INFY.NS',
+    'HDFCBANK.NS'
   ];
 
   const renderGridContent = () => {

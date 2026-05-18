@@ -14,7 +14,7 @@ interface UiState {
 }
 
 export const useUiStore = create<UiState>((set) => ({
-  selectedSymbol: 'RELIANCE',
+  selectedSymbol: 'RELIANCE.NS',
   isOrderPanelOpen: true,
   isWatchlistOpen: true,
   isTerminalMode: false,

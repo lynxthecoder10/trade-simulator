@@ -34,13 +34,25 @@ function generateInitialCandles(basePrice: number): CandlestickData[] {
   return candles;
 }
 
-const SYMBOLS = ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK'];
+const SYMBOLS = [
+  'RELIANCE.NS',
+  'TCS.NS',
+  'HDFCBANK.NS',
+  'INFY.NS',
+  'ICICIBANK.NS',
+  'AAPL',
+  'TSLA',
+  'BTC-USD'
+];
 const BASE_PRICES: Record<string, number> = {
-  'RELIANCE': 2950.50,
-  'TCS': 4120.00,
-  'HDFCBANK': 1450.75,
-  'INFY': 1680.20,
-  'ICICIBANK': 1050.60,
+  'RELIANCE.NS': 2444.70,
+  'TCS.NS': 3854.62,
+  'HDFCBANK.NS': 1426.55,
+  'INFY.NS': 150.61,
+  'ICICIBANK.NS': 149.52,
+  'AAPL': 149.45,
+  'TSLA': 174.78,
+  'BTC-USD': 65000.00,
 };
 
 export default function DashboardPage() {
