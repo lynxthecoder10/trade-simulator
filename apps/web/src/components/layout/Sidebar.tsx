@@ -10,7 +10,6 @@ const navigation = [
   { name: 'Portfolio', href: '/portfolio', icon: Briefcase },
   { name: 'Analytics', href: '/analytics', icon: Activity },
   { name: 'Learn', href: '/learn', icon: BookOpen },
-  { name: 'Profile', href: '/profile', icon: User },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

@@ -52,38 +52,17 @@ export function Header() {
           <span className="absolute -top-1 -right-1 block h-2 w-2 rounded-full bg-profit ring-2 ring-background animate-pulse"></span>
         </button>
 
-        {/* Profile Avatar Trigger Button */}
-        {user ? (
-          <div className="flex items-center gap-3">
-            <Link 
-              href="/profile" 
-              className="group flex items-center gap-2 px-1 py-1 rounded-full bg-background border border-border/85 hover:border-primary/50 hover:bg-muted/30 transition-all cursor-pointer shadow"
-              title="View Account Details"
-            >
-              <img 
-                src={user.avatar} 
-                alt={user.username} 
-                className="h-7 w-7 rounded-full object-cover border border-border group-hover:scale-105 transition-transform" 
-              />
-              <span className="text-xs font-bold text-slate-300 pr-2 hidden md:inline group-hover:text-white transition-colors">
-                {user.username}
-              </span>
-            </Link>
-
-            {/* Logout button */}
-            <button
-              onClick={() => logout()}
-              className="p-2 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
-              title="Secure Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        ) : (
-          <Link href="/auth" className="h-8 w-8 rounded-full bg-accent flex items-center justify-center cursor-pointer border border-border hover:bg-muted transition-colors">
-            <User className="h-4 w-4 text-foreground" />
-          </Link>
-        )}
+        {/* Premium Non-clickable Session Indicator */}
+        <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-background border border-border/80">
+          <img 
+            src={user.avatar} 
+            alt={user.username} 
+            className="h-6 w-6 rounded-full object-cover border border-border" 
+          />
+          <span className="text-xs font-bold text-slate-300 pr-1">
+            {user.username}
+          </span>
+        </div>
       </div>
     </header>
   );

@@ -2,14 +2,9 @@
 
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
-import { useAuthStore } from '@/stores/auth-store';
-import AuthPage from '@/app/auth/page';
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore();
-  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
   // Sync mounting state to avoid hydration mismatch
@@ -25,16 +20,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If unauthenticated and not already on the auth page, render the auth shield!
-  if (!isAuthenticated && pathname !== '/auth') {
-    return <AuthPage />;
-  }
-
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground font-sans selection:bg-primary/30 selection:text-white">
-      {pathname !== '/auth' && <Sidebar />}
+      <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
-        {pathname !== '/auth' && <Header />}
+        <Header />
         <main className="flex-1 overflow-hidden bg-background">
           {children}
         </main>
