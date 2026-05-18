@@ -52,16 +52,27 @@ export function Header() {
           <span className="absolute -top-1 -right-1 block h-2 w-2 rounded-full bg-profit ring-2 ring-background animate-pulse"></span>
         </button>
 
-        {/* Premium Non-clickable Session Indicator */}
-        <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-background border border-border/80">
-          <img 
-            src={user.avatar} 
-            alt={user.username} 
-            className="h-6 w-6 rounded-full object-cover border border-border" 
-          />
-          <span className="text-xs font-bold text-slate-300 pr-1">
-            {user.username}
-          </span>
+        {/* Premium Session Indicator with Disconnect Option */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-background border border-border/80">
+            <img 
+              src={user.avatar} 
+              alt={user.username} 
+              className="h-5 w-5 rounded-full object-cover border border-border bg-slate-900" 
+            />
+            <span className="text-xs font-bold text-slate-300 pr-1">
+              {user.username}
+            </span>
+          </div>
+          
+          <button
+            type="button"
+            onClick={logout}
+            title="Disconnect Terminal Uplink"
+            className="p-1.5 rounded-lg border border-red-950/40 bg-red-950/15 hover:bg-red-950/30 text-red-400/80 hover:text-red-400 transition-all"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </header>
